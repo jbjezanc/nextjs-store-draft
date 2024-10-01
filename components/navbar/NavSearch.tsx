@@ -10,6 +10,7 @@ function NavSearch() {
   const [search, setSearch] = useState(
     searchParams.get("search")?.toString() || ""
   );
+  const extractedSearchParam = searchParams.get("search");
 
   // a function that will be invoked each time a search term is entered
   const handleSearch = useDebouncedCallback((value: string) => {
@@ -26,7 +27,7 @@ function NavSearch() {
     if (!searchParams.get("search")) {
       setSearch("");
     }
-  }, [searchParams.get("search")]);
+  }, [extractedSearchParam]);
 
   return (
     <Input
