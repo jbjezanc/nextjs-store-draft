@@ -32,5 +32,4 @@ function FormInput({
     </div>
   );
 }
-
 export default FormInput;
