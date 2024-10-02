@@ -4,21 +4,31 @@ import db from "@/utils/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
+// helper function to get current authenticated user
+const getAuthUser = async () => {
+  const user = await currentUser();
+  if (!user) redirect("/");
+  return user;
+};
+
+// helper function
+const renderError = (error: unknown): { message: string } => {
+  console.log(error);
+  return {
+    message: error instanceof Error ? error.message : "An error occurred",
+  };
+};
+
 export const fetchFeaturedProducts = async () => {
-  // possibly using the values here, await them and store into a variable
   const products = await db.product.findMany({
     where: {
       featured: true,
     },
-    // select: {
-    //   name: true,
-    // },
   });
   return products;
 };
 
 export const fetchAllProducts = ({ search = "" }: { search: string }) => {
-  // not using the fetched values, just return the result to the calling code
   return db.product.findMany({
     where: {
       OR: [
@@ -50,10 +60,10 @@ export const createProductAction = async (
   prevState: any,
   formData: FormData
 ): Promise<{ message: string }> => {
-  // TODO: access clerkId with helper functions
-  const user = await currentUser();
-  // temp solution to obtain the user
+  // access clerkId with helper functions
+  const user = await getAuthUser();
   if (!user) redirect("/");
+
   try {
     // manually fetch the inputs
     const name = formData.get("name") as string;
@@ -70,7 +80,7 @@ export const createProductAction = async (
         name,
         company,
         price,
-        image: "/images/product-1.jpg", // hardcode for time being
+        image: "/images/product-5.jpg", // hardcode for time being
         description,
         featured,
         clerkId: user.id, // check if the user exists
@@ -79,6 +89,6 @@ export const createProductAction = async (
 
     return { message: "product created" };
   } catch (error) {
-    return { message: "there was an error" };
+    return renderError(error);
   }
 };
