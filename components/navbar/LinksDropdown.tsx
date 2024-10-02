@@ -8,8 +8,12 @@ import { LuAlignLeft } from "react-icons/lu";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { links } from "@/utils/links";
+import { auth } from "@clerk/nextjs/server";
 
 function LinksDropdown() {
+  const { userId } = auth();
+  const isAdmin = userId === process.env.ADMIN_USER_ID;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -19,6 +23,7 @@ function LinksDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="center" sideOffset={10}>
         {links.map((link) => {
+          if (link.label === "dashboard" && !isAdmin) return null;
           return (
             <DropdownMenuItem key={link.href}>
               <Link href={link.href} className="capitalize w-full">
