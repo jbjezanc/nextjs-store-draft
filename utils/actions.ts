@@ -3,7 +3,7 @@
 import db from "@/utils/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { productSchema, validateWithZodSchema } from "./schema";
+import { imageSchema, productSchema, validateWithZodSchema } from "./schema";
 
 // helper function to get current authenticated user
 const getAuthUser = async () => {
@@ -14,7 +14,7 @@ const getAuthUser = async () => {
 
 // helper function
 const renderError = (error: unknown): { message: string } => {
-  console.log(error);
+  // console.log(error);
   return {
     message: error instanceof Error ? error.message : "An error occurred",
   };
@@ -67,8 +67,11 @@ export const createProductAction = async (
 
   try {
     const rawData = Object.fromEntries(formData);
+    const file = formData.get("image") as File;
     // const validatedFields = productSchema.parse(rawData);
     const validatedFields = validateWithZodSchema(productSchema, rawData);
+    const validateFile = validateWithZodSchema(imageSchema, { image: file });
+    // console.log(validateFile);
 
     await db.product.create({
       data: {
