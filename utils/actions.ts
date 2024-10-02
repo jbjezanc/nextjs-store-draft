@@ -4,7 +4,7 @@ import db from "@/utils/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { imageSchema, productSchema, validateWithZodSchema } from "./schema";
-import { uploadImage } from "./supabase";
+import { deleteImage, uploadImage } from "./supabase";
 import { revalidatePath } from "next/cache";
 
 // helper function to get current authenticated user
@@ -108,11 +108,12 @@ export const deleteProductAction = async (prevState: { productId: string }) => {
   const { productId } = prevState;
   await getAdminUser();
   try {
-    await db.product.delete({
+    const product = await db.product.delete({
       where: {
         id: productId,
       },
     });
+    await deleteImage(product.image);
     revalidatePath("/admin/products");
     return { message: "product removed" };
   } catch (error) {
