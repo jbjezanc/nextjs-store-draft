@@ -120,3 +120,28 @@ export const deleteProductAction = async (prevState: { productId: string }) => {
     return renderError(error);
   }
 };
+
+export const fetchAdminProductDetails = async (productId: string) => {
+  await getAdminUser();
+  const product = await db.product.findUnique({
+    where: {
+      id: productId,
+    },
+  });
+  if (!product) redirect("/admin/products");
+  return product;
+};
+
+export const updateProductAction = async (
+  prevState: any,
+  formData: FormData
+) => {
+  return { message: "Product updated successfully" };
+};
+
+export const updateProductImageAction = async (
+  prevState: any,
+  formData: FormData
+) => {
+  return { message: "Product Image updated successfully" };
+};
