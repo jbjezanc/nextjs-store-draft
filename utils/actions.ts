@@ -3,6 +3,7 @@
 import db from "@/utils/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { productSchema } from "./schema";
 
 // helper function to get current authenticated user
 const getAuthUser = async () => {
@@ -65,27 +66,10 @@ export const createProductAction = async (
   if (!user) redirect("/");
 
   try {
-    // manually fetch the inputs
-    const name = formData.get("name") as string;
-    const company = formData.get("company") as string;
-    // will be dealt with Zod
-    const price = Number(formData.get("price") as string);
-    // temp (will be stored on a supabase bucket)
-    const image = formData.get("image") as File;
-    const description = formData.get("description") as string;
-    const featured = Boolean(formData.get("featured") as string);
+    const rawData = Object.fromEntries(formData);
+    const validatedFields = productSchema.parse(rawData);
 
-    await db.product.create({
-      data: {
-        name,
-        company,
-        price,
-        image: "/images/product-5.jpg", // hardcode for time being
-        description,
-        featured,
-        clerkId: user.id, // check if the user exists
-      },
-    });
+    console.log(rawData);
 
     return { message: "product created" };
   } catch (error) {
