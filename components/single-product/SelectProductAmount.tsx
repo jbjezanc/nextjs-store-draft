@@ -46,7 +46,7 @@ function SelectProductAmount(
           {Array.from({ length: cartItem ? amount + 10 : 10 }, (_, index) => {
             const selectValue = (index + 1).toString();
             return (
-              <SelectItem key={selectValue} value={selectValue}>
+              <SelectItem key={index} value={selectValue}>
                 {selectValue}
               </SelectItem>
             );
@@ -56,5 +56,4 @@ function SelectProductAmount(
     </>
   );
 }
-
 export default SelectProductAmount;
