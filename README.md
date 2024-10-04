@@ -613,6 +613,7 @@ const upsertTask = await prisma.task.upsert({
 });
 ```
 
+
 - Delete a single record
 
 ```js
@@ -2024,7 +2025,7 @@ function FormInput({
     <div className="mb-2">
       <Label htmlFor={name} className="capitalize">
         {label || name}
-      </Label>
+      </Label> 
       <Input
         id={name}
         name={name}

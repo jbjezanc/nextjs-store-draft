@@ -28,9 +28,56 @@ export const POST = async (req: NextRequest) => {
     });
   }
 
+  // cart subtotal
+  const subtotal = cart.cartItems.reduce((acc, cartItem) => {
+    return acc + cartItem.product.price * cartItem.amount;
+  }, 0);
+
+  // dynamically determine tax rate (using 10% )
+  const taxRate = 0.1; // could be dynamically calculated from region
+  const taxAmount = subtotal * taxRate;
+
+  // tax line item
+  const taxLineItem = {
+    quantity: 1,
+    price_data: {
+      currency: "usd",
+      product_data: {
+        name: "Tax",
+      },
+      unit_amount: Math.round(taxAmount * 100), // Convert to cents
+    },
+  };
+
+  // shipping line item
+  const shippingLineItem = {
+    quantity: 1,
+    price_data: {
+      currency: "usd",
+      product_data: {
+        name: "Shipping",
+      },
+      unit_amount: 500, // shipping is $5.00 (500 cents
+    },
+  };
+
   // line items
-  const line_items = cart.cartItems.map((cartItem) => {
-    return {
+  // const line_items = cart.cartItems.map((cartItem) => {
+  //   return {
+  //     quantity: cartItem.amount,
+  //     price_data: {
+  //       currency: "usd",
+  //       product_data: {
+  //         name: cartItem.product.name,
+  //         images: [cartItem.product.image],
+  //       },
+  //       unit_amount: cartItem.product.price * 100, // price in cents
+  //     },
+  //   };
+  // });
+
+  const line_items = [
+    ...cart.cartItems.map((cartItem) => ({
       quantity: cartItem.amount,
       price_data: {
         currency: "usd",
@@ -38,11 +85,13 @@ export const POST = async (req: NextRequest) => {
           name: cartItem.product.name,
           images: [cartItem.product.image],
         },
-        unit_amount: cartItem.product.price * 100, // price in cents
+        unit_amount: cartItem.product.price * 100,
       },
-    };
-  });
-
+    })),
+    shippingLineItem,
+    taxLineItem,
+  ];
+  
   try {
     const session = await stripe.checkout.sessions.create({
       ui_mode: "embedded",
