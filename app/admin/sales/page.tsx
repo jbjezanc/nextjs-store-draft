@@ -26,7 +26,7 @@ async function SalesPage() {
           <TableHead>Shipping</TableHead>
           <TableHead>Date</TableHead>
         </TableRow>
-      </TableHeader>
+    </TableHeader>
       <TableBody>
         {orders.map((order) => {
           const { id, products, orderTotal, tax, shipping, createdAt, email } =
